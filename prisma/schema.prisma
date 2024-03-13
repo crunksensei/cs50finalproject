@@ -1,0 +1,33 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model users {
+  id        String @id @default(auto()) @map("_id") @db.ObjectId
+  password  String
+  timestamp DateTime @default(now())
+  username  String @unique
+  email     String @unique
+}
+
+model comment {
+  id        String @id @default(auto()) @map("_id") @db.ObjectId
+  timestamp DateTime @default(now())
+  text      String
+  userid      String
+  gameid      String
+}
+
+model session {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String?  @db.ObjectId
+  token     String     // Stores session data. Adjust type as necessary for your use case.
+  expires   DateTime // Timestamp when the session expires
+  createdAt DateTime @default(now())
+  isValid   Boolean  @default(true)
+}

@@ -1,5 +1,5 @@
-import { cssBundleHref } from "@remix-run/css-bundle";
 import type { LinksFunction } from "@remix-run/node";
+import stylesheet from "~/tailwind.css";
 import {
   Links,
   LiveReload,
@@ -7,10 +7,12 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
+  Link,
 } from "@remix-run/react";
 
+
 export const links: LinksFunction = () => [
-  ...(cssBundleHref ? [{ rel: "stylesheet", href: cssBundleHref }] : []),
+  { rel: "stylesheet", href: stylesheet },
 ];
 
 export default function App() {
@@ -23,11 +25,34 @@ export default function App() {
         <Links />
       </head>
       <body>
-        <Outlet />
-        <ScrollRestoration />
-        <Scripts />
-        <LiveReload />
+        <Layout>
+          <Outlet />
+          <ScrollRestoration />
+          <Scripts />
+          <LiveReload />
+        </Layout>
       </body>
     </html>
   );
+}
+
+function Layout({children}: {children: React.ReactNode}) {
+  return (
+    <>
+    <nav className="flex justify-between items-center px-10 py-5">
+      <Link prefetch="intent" to="/" className="text-2xl font-semibold">
+        Game Reviews <span className="text-teal-700">DB</span> 
+      </Link>
+      <div className="flex gap-4">
+          <Link to="/login">
+            <button className="bg-teal-500 px-4 py-2 rounded-lg text-white">Login</button>
+          </Link>
+          <Link to="/register">
+            <button className="bg-teal-500 px-4 py-2 rounded-lg text-white">Register</button>
+          </Link>
+        </div>
+    </nav>
+    <main>{children}</main>
+    </>
+  )
 }
