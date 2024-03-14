@@ -36,9 +36,9 @@ export async function action({
   console.log(email)
   const passwordChecker = await checkPasswordComplexity(password)
   if (!passwordChecker.isValid) {
-    // Return or handle the error response here. 
-    // You can return passwordCheck.errors to the client to show what part of the complexity check failed.
-    return json({ errors: passwordChecker.errors }, { status: 400 });
+    // Instead of returning an alert, return the errors in a response object
+    return json({ errors: { message: "" } }, { status: 400 });
+
   }
 
   return null;
@@ -49,12 +49,12 @@ export async function action({
 }
 
 
-function PasswordComplexityMessage({ password }) {
+function PasswordComplexityMessage({ password, confirmPassword  }) {
     const hasLength = password.length >= 8;
     const hasUppercase = /[A-Z]/.test(password);
     const hasLowercase = /[a-z]/.test(password);
     const hasNumber = /[0-9]/.test(password);
-    const hasSpecialChar = /[\^$*.[\]{}()?"!@#%&/\\,><':;|_~`]/.test(password);
+    const passwordsMatch = password === confirmPassword;
   
     if (!password) {
       return null;
@@ -66,22 +66,15 @@ function PasswordComplexityMessage({ password }) {
         {!hasUppercase && <div>Include at least one uppercase letter.</div>}
         {!hasLowercase && <div>Include at least one lowercase letter.</div>}
         {!hasNumber && <div>Include at least one number.</div>}
-        {!hasSpecialChar && <div>Include at least one special character.</div>}
+        {!passwordsMatch && confirmPassword && <div>Passwords must match.</div>}
       </div>
     );
   }
 
-
-
-
-
 export default function Register() {
     const actionData = useActionData();
     const [password, setPassword] = useState('');
-
-    const handlePasswordChange = (event) => {
-    setPassword(event.target.value);
-  };
+    const [confirmPassword, setConfirmPassword] = useState('');
   return (
     <div className="flex items-center justify-center h-screen bg-gray-50">
       <div className="max-w-md w-full space-y-8">
@@ -90,6 +83,18 @@ export default function Register() {
             Create your account
           </h2>
         </div>
+        {actionData?.errors && (
+            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+              <strong className="font-bold">Please Make sure</strong>
+              <p><span className="block sm:inline">Username exists</span></p>              
+              <p><span className="block sm:inline">Email exists</span><p></p></p>              
+              <p><span className="block sm:inline">Password must be at least 8 characters.</span></p>              
+              <p><span className="block sm:inline">Password includes at least one uppercase letter.</span></p>              
+              <p><span className="block sm:inline">Password includes at least one lowercase letter.</span></p>              
+              <p><span className="block sm:inline">Password includes at least one number.</span></p>
+              <p><span className="block sm:inline">Passwords match.</span></p>
+            </div>
+          )}
         <Form method="post" className="mt-8 space-y-6">
           <input type="hidden" name="remember" value="true" />
           <div className="rounded-md shadow-sm -space-y-px">
@@ -134,9 +139,9 @@ export default function Register() {
                 className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
                 placeholder="Password"
                 value={password}
-                onChange={handlePasswordChange}
+                onChange={e => setPassword(e.target.value)}
             />
-            <PasswordComplexityMessage password={password} />
+            <PasswordComplexityMessage password={password}  />
             </div>
             <div className="py-2">
               <label htmlFor="confirm-password" className="sr-only">
@@ -148,13 +153,15 @@ export default function Register() {
                 type="password"
                 autoComplete="new-password"
                 required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
                 placeholder="Confirm Password"
+                value={confirmPassword}
+                onChange={e => setConfirmPassword(e.target.value)}
               />
             </div>
           </div>
-
-          <div>
+          <PasswordComplexityMessage password={password} confirmPassword={confirmPassword} />
+             <div>
             <button
               type="submit"
               className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-teal-500 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:bg-teal-500"

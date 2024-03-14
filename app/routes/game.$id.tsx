@@ -1,6 +1,5 @@
 import type { LoaderFunction } from "@remix-run/node";
 import { Outlet, useLoaderData } from "@remix-run/react";
-import isAuthenticated from '../utils/auth';
 import { getSession } from "../utils/session.server";
 
 type Game = {
@@ -21,24 +20,8 @@ type Game = {
     const session = await getSession(
       request.headers.get("Cookie")
     );
-    console.log(session.get("userId"))
-    console.log(session.get("token"))
     const apikey = "e7acb02f54c445d4a95223c5a5104f64";
-    const url = `https://api.rawg.io/api/games/${params.id}?key=${apikey}`;
-    try {
-      // Await the isAuthenticated function to ensure it completes before proceeding
-      console.log("checking if authenticated")
-      
-      await isAuthenticated(request);
-      console.log("i is authenticated")
-    } catch (response) {
-      console.log("not authenticated")
-      
-      // If isAuthenticated throws a Response object, return it directly to trigger a redirect
-      // Note: This assumes isAuthenticated is designed to throw a Response for redirection
-      throw response;
-    }
-    
+    const url = `https://api.rawg.io/api/games/${params.id}?key=${apikey}`;   
     try {
       const response = await fetch(url);
       const game: Game = await response.json();

@@ -42,3 +42,20 @@ export default isAuthenticated;
 //   // isAuthenticated threw a Response, use it directly to redirect or respond
 //   return response;
 // }
+
+
+
+// put in loader
+// try {
+//   // Await the isAuthenticated function to ensure it completes before proceeding
+//   console.log("checking if authenticated")
+  
+//   await isAuthenticated(request);
+//   console.log("i is authenticated")
+// } catch (response) {
+//   console.log("not authenticated")
+  
+//   // If isAuthenticated throws a Response object, return it directly to trigger a redirect
+//   // Note: This assumes isAuthenticated is designed to throw a Response for redirection
+//   throw response;
+// }
