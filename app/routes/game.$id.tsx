@@ -2,6 +2,9 @@ import type { LoaderFunction } from "@remix-run/node";
 import { Outlet, useLoaderData } from "@remix-run/react";
 import { getSession } from "../utils/session.server";
 
+
+
+
 type Game = {
     id: number;
     name: string;
@@ -16,11 +19,10 @@ type Game = {
   };
 
   export const loader: LoaderFunction = async ({ params, request }) => {
-    
     const session = await getSession(
       request.headers.get("Cookie")
     );
-    const apikey = "e7acb02f54c445d4a95223c5a5104f64";
+    const apikey = "e7acb02f54c445d4a95223c5a5104f64"
     const url = `https://api.rawg.io/api/games/${params.id}?key=${apikey}`;   
     try {
       const response = await fetch(url);

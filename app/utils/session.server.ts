@@ -1,7 +1,7 @@
 // app/services/session.server.ts
 import { createCookieSessionStorage } from "@remix-run/node";
 import { db } from "~/utils/db.server"
-
+import bcrypt from "bcryptjs";
 import crypto from 'crypto';
 
 // type SessionData = {
@@ -25,23 +25,25 @@ export const sessionStorage = createCookieSessionStorage({
   },
 });
 
-export async function validateCredentials(username: string, password: string): Promise<string | null> {
-  // Replace this with your own database lookup.
-  if (!username || username.length === 0 || !password || password.length < 6) {
+export async function validateCredentials(email: string, inputPassword: string): Promise<string | null> {
+  if (!email || email.length === 0 || !inputPassword || inputPassword.length < 6) {
     return Promise.resolve(null);
   }
-
   const user = await db.users.findFirst({
     where: {
-      username: username,
-      password: password
+      email: email,
     }
   })
- 
   if (!user || user == null) {
     return Promise.resolve(null)
   }
-  return Promise.resolve(user.id);
+
+  const isMatch = await bcrypt.compare(inputPassword, user.password);
+  if (isMatch) {
+    return Promise.resolve(user.id);
+  }
+ 
+return Promise.resolve(null)
 }
 
 
@@ -102,6 +104,21 @@ export function checkPasswordComplexity(password) {
     }
   };
 }
+
+export async function hashAndStore(username: string, email: string, password: string){
+   bcrypt.hash(password, 10, async function(err, hash) {
+    const newUser = await db.users.create({
+        data: {
+          username: username,
+          email: email,
+          password: hash,
+        },
+      });
+      const userId = newUser.id;
+      return userId;
+  });
+}
+
 
 
 

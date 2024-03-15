@@ -1,8 +1,9 @@
 import { Form, Link, useActionData } from "@remix-run/react";
 import {ActionFunctionArgs, LoaderFunctionArgs, json, redirect} from "@remix-run/node";
-import { getSession, validateRegister, checkPasswordComplexity } from "../utils/session.server";
+import { getSession, validateRegister, checkPasswordComplexity, hashAndStore } from "../utils/session.server";
 import { db } from "../utils/db.server";
 import { useState } from 'react';
+
 
 export async function loader({
   request,
@@ -18,7 +19,6 @@ export async function loader({
   return null;
 }
 
-
 export async function action({
   request,
 }: ActionFunctionArgs) {
@@ -29,23 +29,17 @@ export async function action({
   const confimPassword = form.get("confirm-password");
   const email = form.get("email");
   const validator = await validateRegister(email, password, confimPassword, username);
-  console.log(validator)
-  console.log(username)
-  console.log(password)
-  console.log(confimPassword)
-  console.log(email)
   const passwordChecker = await checkPasswordComplexity(password)
   if (!passwordChecker.isValid) {
     // Instead of returning an alert, return the errors in a response object
     return json({ errors: { message: "" } }, { status: 400 });
-
   }
-
-  return null;
-//   if (validator)
-//     {
-
-//     }
+  if (!validator) {
+    // Instead of returning an alert, return the errors in a response object
+    return json({ errors: { message: "" } }, { status: 400 });
+  }
+  hashAndStore(username, email, password);
+  return redirect("/login");
 }
 
 

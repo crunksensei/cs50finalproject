@@ -37,7 +37,7 @@ export async function action({
   const password = form.get("password");
 
   const userId = await validateCredentials(email, password);
-  
+  console.log(userId)
   if (userId == null) {
     session.flash("error", "Invalid username/password");
 
