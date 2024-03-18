@@ -25,8 +25,8 @@ model comment {
 
 model session {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  userId    String?  @db.ObjectId
-  token     String     // Stores session data. Adjust type as necessary for your use case.
+  userId    String?  @db.ObjectId 
+  token     String   @unique
   expires   DateTime // Timestamp when the session expires
   createdAt DateTime @default(now())
   isValid   Boolean  @default(true)

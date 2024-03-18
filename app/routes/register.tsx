@@ -1,6 +1,6 @@
 import { Form, Link, useActionData } from "@remix-run/react";
 import {ActionFunctionArgs, LoaderFunctionArgs, json, redirect} from "@remix-run/node";
-import { getSession, validateRegister, checkPasswordComplexity, hashAndStore } from "../utils/session.server";
+import { getSession, commitSession, validateRegister, hashAndStore, generateSecureToken } from "../utils/session.server";
 import { db } from "../utils/db.server";
 import { useState } from 'react';
 
@@ -26,20 +26,37 @@ export async function action({
   const form = await request.formData();
   const username = form.get("username");
   const password = form.get("password");
-  const confimPassword = form.get("confirm-password");
+  const confirmPassword = form.get("confirm-password");
   const email = form.get("email");
-  const validator = await validateRegister(email, password, confimPassword, username);
-  const passwordChecker = await checkPasswordComplexity(password)
-  if (!passwordChecker.isValid) {
-    // Instead of returning an alert, return the errors in a response object
-    return json({ errors: { message: "" } }, { status: 400 });
+  const validator = await validateRegister(email, username, password, confirmPassword);
+  if (validator.isValid == false) {
+    return json({ errors: { message: validator.errors } }, { status: 400 });
   }
-  if (!validator) {
-    // Instead of returning an alert, return the errors in a response object
-    return json({ errors: { message: "" } }, { status: 400 });
+  
+  if (validator.isValid == true){
+    const session = await getSession(
+      request.headers.get("Cookie")
+    );
+  try{
+  const userId = await hashAndStore(username, email, password);
+  console.log(userId)    
+  const token = generateSecureToken();
+  const expires = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+  session.set("userId", userId);
+  session.set("token", token);
+  await db.session.create({
+    data: { userId, token, expires },
+  });
+  return redirect("/", {
+    headers: {
+      "Set-Cookie": await commitSession(session, { expires }),
+    },
+  }); 
+  } catch (error) {
+    console.error('Error registering user:', error);
+    throw new Response("Error registering user", { status: 500 });
   }
-  hashAndStore(username, email, password);
-  return redirect("/login");
+}  
 }
 
 
@@ -79,15 +96,13 @@ export default function Register() {
         </div>
         {actionData?.errors && (
             <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
-              <strong className="font-bold">Please Make sure</strong>
-              <p><span className="block sm:inline">Username exists</span></p>              
-              <p><span className="block sm:inline">Email exists</span><p></p></p>              
-              <p><span className="block sm:inline">Password must be at least 8 characters.</span></p>              
-              <p><span className="block sm:inline">Password includes at least one uppercase letter.</span></p>              
-              <p><span className="block sm:inline">Password includes at least one lowercase letter.</span></p>              
-              <p><span className="block sm:inline">Password includes at least one number.</span></p>
-              <p><span className="block sm:inline">Passwords match.</span></p>
-            </div>
+            <strong className="font-bold">Error:</strong>
+            <ul>
+              {actionData.errors.message.map((error, index) => (
+                <li key={index}>{error}</li>
+              ))}
+            </ul>
+          </div>
           )}
         <Form method="post" className="mt-8 space-y-6">
           <input type="hidden" name="remember" value="true" />
