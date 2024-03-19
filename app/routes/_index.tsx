@@ -1,8 +1,7 @@
-import type { LoaderFunction, MetaFunction, json } from "@remix-run/node";
-import { useLoaderData, Link, useFetcher } from "@remix-run/react";
+import type { LoaderFunction, MetaFunction } from "@remix-run/node";
+import { useLoaderData, Link } from "@remix-run/react";
 import { getSession } from "../utils/session.server";
 
-const apikey = process.env.apikey;
 
 type Game = {
   id: number;
@@ -24,6 +23,7 @@ export const meta: MetaFunction = () => {
 };
 
 export const loader: LoaderFunction = async ({ request }): Promise<Game[]> => {
+  const apikey = process.env.apikey;
   const session = await getSession(request.headers.get("Cookie"));
   const urlParams = new URL(request.url).searchParams;
   const category = urlParams.get("category") || "trending";
@@ -35,10 +35,8 @@ export const loader: LoaderFunction = async ({ request }): Promise<Game[]> => {
       year + 2
     }-12-31&ordering=-added`;
   } else if (category === "top_rated") {
-    // Your existing code for 'recent' category
     apiUrl = `https://api.rawg.io/api/games?key=${apikey}&dates=${year}-01-01,${year}-12-31&ordering=-rating`;
   } else if (category === "updated") {
-    // Your existing code for 'updated' category
     apiUrl = `https://api.rawg.io/api/games?key=${apikey}&dates=${year}-01-01,${year}-12-31&ordering=-updated`;
   }
   try {
@@ -51,7 +49,7 @@ export const loader: LoaderFunction = async ({ request }): Promise<Game[]> => {
         !nsfwKeywords.includes(game.esrb_rating.name)
       );
     });
-    return filteredData.slice(0, 12);
+    return filteredData.splice(0,12);
   } catch (error) {
     console.error("Error fetching data:", error);
     throw new Response("Error fetching data", { status: 500 });
@@ -60,11 +58,6 @@ export const loader: LoaderFunction = async ({ request }): Promise<Game[]> => {
 
 export default function Index() {
   const data = useLoaderData<Game[]>();
-  const fetcher = useFetcher();
-  // Function to handle category change
-  function handleCategoryChange(category: string) {
-    fetcher.load(`/?category=${category}`);
-  }
   return (
     <div className="bg-white py-6 sm:py-8 lg:py-12">
       <div className="mx-auto max-w-screen-2xl px-4 md:px-8">

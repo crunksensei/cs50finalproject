@@ -46,69 +46,33 @@ export default function App() {
   );
 }
 
-export async function action({
-  request,
-}: ActionFunctionArgs) {
-  console.log('im here')
-  const apikey = process.env.apikey;
-  const [results, setResults] = useState([]);
-  const urlParams = new URL(request.url).searchParams;
-  const query = urlParams.get("query");
-  console.log(urlParams)
-  // console.log(results);
-  if (query) {
-    await fetch(
-      `https://api.rawg.io/api/games?key=${apikey}&search=${query}`
-    )
-      .then((response) => response.json())
-      .then((data) => setResults(data.results))
-      .catch((error) => console.error("Failed to fetch games:", error));
-  }
-}
+// console.log('im here')
+// const apikey = process.env.apikey;
+// const [results, setResults] = useState([]);
+// const urlParams = new URL(request.url).searchParams;
+// const query = urlParams.get("query");
+// console.log(urlParams)
+// // console.log(results);
+// if (query) {
+//   await fetch(
+//     `https://api.rawg.io/api/games?key=${apikey}&search=${query}`
+//   )
+//     .then((response) => response.json())
+//     .then((data) => setResults(data.results))
+//     .catch((error) => console.error("Failed to fetch games:", error));
+// }
 
-
-// function SearchResults() {
-//   const apikey = process.env.apikey;
-  
-//   const [results, setResults] = useState([]);
-//   useEffect(() => {
-//     if (search) {
-//       fetch(
-//         `https://api.rawg.io/api/games?key=${apikey}&search=${urlParams}`
-//       )
-//         .then((response) => response.json())
-//         .then((data) => setResults(data.results))
-//         .catch((error) => console.error("Failed to fetch games:", error));
-//     }
-//   }, [search]);
-//   console.log(search)
-//   console.log(results)
-//   if (!search) {
-//     return null;
-//   }
-  
-  // return (
-  //   <div className="absolute bg-white border border-gray-200 mt-1 rounded-md overflow-hidden z-10">
-  //     {results.map((game) => (
-  //       <div key={game.id} className="p-2 hover:bg-gray-100">
-  //         {game.name}
-  //       </div>
-  //     ))}
-  //   </div>
-  // );
+// export async function action({
+//   request,
+// }: ActionFunctionArgs) {
+//   const formData = await request.formData();
+//   const query = formData.get("query");
+//   return redirect('/search');
 // }
 
 function Layout({ children }: { children: React.ReactNode }) {
   const actionData = useActionData();
   const data = useLoaderData();
-  console.log(actionData)
-  const [search, setSearch] = useState("");
-
-  const fetcher = useFetcher();
-  function handleCategoryChange(query: string) {
-    fetcher.load(`/?category=${query}`);
-  }
-//  <SearchResults search={search} /> 
 
   return (
     <>
@@ -116,16 +80,19 @@ function Layout({ children }: { children: React.ReactNode }) {
         <Link prefetch="intent" to="/" className="text-2xl font-semibold">
           Game Reviews <span className="text-teal-700">DB</span>
         </Link>
-        <form action={`/?category=${search}`} method="get" className="flex items-center">
-        <input
-          type="search"
-          name="query"
-          placeholder="Search games"
-          onChange={handleCategoryChange}
-          className="px-4 py-2 rounded-lg text-black border-2 border-teal-300 focus:outline-none w-full"
-        />
+        <form
+          action="/search"
+          method="get"
+          className="flex items-center w-1/3 mx-3"
+        >
+          <input
+            type="search"
+            name="query"
+            placeholder="Search games"
+            className="px-4 py-2 rounded-lg text-black border-2 border-teal-300 focus:outline-none w-full"
+          />
         </form>
-        
+
         {data.session.data.userId ? (
           <form action="/logout" method="post">
             <button
@@ -154,25 +121,3 @@ function Layout({ children }: { children: React.ReactNode }) {
     </>
   );
 }
-
-{/* <fetcher.Form action="/search" method="get" className="flex items-center">
-<input
-  type="search"
-  name="query"
-  placeholder="Search games"
-  onChange={handleChange}
-  className="px-4 py-2 rounded-lg text-black border-2 border-teal-300 focus:outline-none w-full"
-/>
-</fetcher.Form> */}
-
-
-
-
-// <input
-//           type="search"
-//           name="query"
-//           placeholder="Search games"
-//           onChange={(e) => setSearch(e.target.value)}
-//           className="px-4 py-2 rounded-lg text-black border-2 border-teal-300 focus:outline-none w-full"
-//         />
-//         <SearchResults search={search} />

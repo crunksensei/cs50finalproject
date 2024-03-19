@@ -1,5 +1,5 @@
 import { Form, useLoaderData } from "@remix-run/react";
-import type { LoaderFunction } from "@remix-run/node";
+import type { LoaderFunction, MetaFunction } from "@remix-run/node";
 import { db } from "~/utils/db.server";
 import { getSession } from "../utils/session.server";
 import isAuthenticated from "../utils/auth.server";
@@ -11,6 +11,7 @@ type Comments = {
   gameid: string;
   timestamp: string;
 };
+
 
 export const loader: LoaderFunction = async ({ params }) => {
   const data: Comments[] = await db.comment.findMany({
