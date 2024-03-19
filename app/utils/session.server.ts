@@ -53,6 +53,22 @@ export async function validateCredentials(
   return Promise.resolve(null);
 }
 
+export async function addComment(comment: string, userId: string, gameId: string) {
+  const username = await db.users.findFirst({
+    where: { id: userId },
+  });
+  if (!username) {
+    throw new Error("User not found");
+  }
+  await db.comment.create({
+    data: {
+      text: comment,
+      username: username.username,
+      gameid: gameId,
+    },
+  });
+}
+
 export async function saveSessionToDatabase({ userId, expires, token }) {
   await db.session.create({
     data: {

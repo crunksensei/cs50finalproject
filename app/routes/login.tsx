@@ -1,4 +1,4 @@
-import { Form, Link, useActionData, useLoaderData } from "@remix-run/react";
+import { Form, Link, useLoaderData } from "@remix-run/react";
 import {
   ActionFunctionArgs,
   LoaderFunctionArgs,
@@ -10,8 +10,6 @@ import {
   generateSecureToken,
   commitSession,
   validateCredentials,
-  saveSessionToDatabase,
-  validateSessionToken,
 } from "../utils/session.server";
 import { db } from "../utils/db.server";
 

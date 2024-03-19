@@ -8,26 +8,26 @@ datasource db {
 }
 
 model users {
-  id        String @id @default(auto()) @map("_id") @db.ObjectId
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
   password  String
   timestamp DateTime @default(now())
-  username  String @unique
-  email     String @unique
+  username  String   @unique
+  email     String   @unique
 }
 
 model comment {
-  id        String @id @default(auto()) @map("_id") @db.ObjectId
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
   timestamp DateTime @default(now())
   text      String
-  userid      String
-  gameid      String
+  username  String
+  gameid    String
 }
 
 model session {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  userId    String?  @db.ObjectId 
+  userId    String?  @db.ObjectId
   token     String   @unique
-  expires   DateTime // Timestamp when the session expires
+  expires   DateTime 
   createdAt DateTime @default(now())
   isValid   Boolean  @default(true)
 }

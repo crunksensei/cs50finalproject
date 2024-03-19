@@ -9,12 +9,10 @@ import {
   ScrollRestoration,
   Link,
   useLoaderData,
-  useActionData,
 } from "@remix-run/react";
-import { useFetcher } from "@remix-run/react";
-import { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
+import { LoaderFunctionArgs } from "@remix-run/node";
 import { getSession } from "./utils/session.server";
-import { useEffect, useState } from "react";
+
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const session = await getSession(request.headers.get("Cookie"));
@@ -46,34 +44,8 @@ export default function App() {
   );
 }
 
-// console.log('im here')
-// const apikey = process.env.apikey;
-// const [results, setResults] = useState([]);
-// const urlParams = new URL(request.url).searchParams;
-// const query = urlParams.get("query");
-// console.log(urlParams)
-// // console.log(results);
-// if (query) {
-//   await fetch(
-//     `https://api.rawg.io/api/games?key=${apikey}&search=${query}`
-//   )
-//     .then((response) => response.json())
-//     .then((data) => setResults(data.results))
-//     .catch((error) => console.error("Failed to fetch games:", error));
-// }
-
-// export async function action({
-//   request,
-// }: ActionFunctionArgs) {
-//   const formData = await request.formData();
-//   const query = formData.get("query");
-//   return redirect('/search');
-// }
-
 function Layout({ children }: { children: React.ReactNode }) {
-  const actionData = useActionData();
   const data = useLoaderData();
-
   return (
     <>
       <nav className="flex justify-between items-center px-10 py-5 w-full">

@@ -50,13 +50,15 @@ export async function loader({ request }) {
   });
 }
 
-export default function Index() {
-  const { games, currentPage, totalPages, query } = useLoaderData<LoaderData>();
 
+
+
+export default function Index() {
+  const { games, currentPage, totalPages, query } = useLoaderData<LoaderData>(); 
   return (
     <div className="bg-white py-6 sm:py-8 lg:py-12">
       <div className="mx-auto max-w-screen px-4 md:px-8">
-        <div className="grid grid-col-2 gap-4">
+        <div className="grid gap-4 sm:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 xl:gap-8">
           {games.map((game: Game) => (
             <Link key={game.id} to={`/game/${game.id}/comments`}>
               <div
@@ -66,10 +68,10 @@ export default function Index() {
                 <img
                   src={game.background_image}
                   alt={game.name}
-                  className="flex-none w-60 h-60 object-cover rounded-lg mr-4 col-start-1"
+                  className="flex-none w-60 h-60 object-cover rounded-lg mr-4"
                 />
 
-                <div className="flex-grow mt-4 col-2">
+                <div className="flex-grow mt-4">
                   <h3 className="text-lg font-semibold">{game.name}</h3>
                   {game.metacritic ? (
                     <p className="mt-2 text-sm">
@@ -80,7 +82,6 @@ export default function Index() {
                   ) : null}
 
                   <div>{game.genres?.map((g) => g.name).join(", ")}</div>
-                  <div className="mt-4 text-sm">{game.description_raw}</div>
                   <div>
                     {game.platforms?.map((p) => p.platform.name).join(", ")}
                   </div>
