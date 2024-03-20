@@ -4,8 +4,9 @@ import {
   useNavigation,
   useParams,
   useFetcher,
+  useActionData,
 } from "@remix-run/react";
-import { LoaderFunction, ActionFunctionArgs, redirect } from "@remix-run/node";
+import { LoaderFunction, ActionFunctionArgs, redirect, json  } from "@remix-run/node";
 import { db } from "~/utils/db.server";
 import { getSession, addComment } from "../utils/session.server";
 
@@ -25,22 +26,23 @@ export async function action({ request, params }: ActionFunctionArgs) {
   const form = await request.formData();
   const comment = form.get("comment");
   const userId = session.get("userId");
-
+  const regex = /[A-Za-z]/;
   if (
     !comment ||
     typeof comment != "string" ||
     !userId ||
     typeof userId != "string" ||
     !params.id ||
-    typeof params.id != "string"
+    typeof params.id != "string" ||
+    !regex.test(comment)
   ) {
-    throw new Response("Error posting comment", { status: 500 });
+    return { error: "Please enter a valid comment." };
   }
   try {
     await addComment(comment as string, userId as string, params.id as string);
   } catch (e) {
     console.log(e);
-    throw new Response("User not found / server error", { status: 500 });
+    return { error: "Failed posting comment." };
   }
   return null;
 }
@@ -65,6 +67,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 export default function Comments() {
   const params = useParams();
   const fetcher = useFetcher();
+  const actionData = useActionData();
   const gameId = params.id;
   const data = useLoaderData<Comments[]>();
   const navigation = useNavigation();
@@ -81,9 +84,19 @@ export default function Comments() {
     <div className="rounded-lg boarder p-3">
       <h1 className="text-xl font-semibold mb-5">Your Opinion</h1>
       <div>
+      {actionData?.error && ( // Use optional chaining here
+          <div className="bg-red-500 text-white p-3 rounded-lg">
+            {actionData.error}
+        </div>)}
         <Form method="POST">
           <textarea
             name="comment"
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault(); // Prevent default to stop from adding a new line
+                e.currentTarget.form.requestSubmit(); // Submit the form
+              }
+            }}
             className="w-full border border-teal-500 rounded-lg p-2"
           ></textarea>
           <input type="hidden" name="id" value={data.id} />
