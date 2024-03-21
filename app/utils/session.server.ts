@@ -134,6 +134,10 @@ export async function hashAndStore(
   });
 }
 
+export async function generateHash(password: string){
+  return bcrypt.hashSync(password, 10);
+}
+
 export async function validateRegister(
   email: string,
   username: string,
@@ -171,6 +175,48 @@ export async function validateRegister(
     }
   }
 
+  if (!/.{8,}/.test(password)) {
+    // Corrected to 8 characters
+    errors.push("Password must be at least 8 characters long.");
+  }
+  if (!/[A-Z]/.test(password)) {
+    errors.push("Password must contain at least one uppercase letter.");
+  }
+  if (!/[a-z]/.test(password)) {
+    errors.push("Password must contain at least one lowercase letter.");
+  }
+  if (!/[0-9]/.test(password)) {
+    errors.push("Password must contain at least one number.");
+  }
+  if (password !== confimPassword) {
+    errors.push("Passwords must match.");
+  }
+
+  if (errors.length > 0) {
+    return {
+      isValid: false,
+      errors: errors,
+    };
+  }
+  return { isValid: true };
+}
+
+export async function validatePasswordChange(
+  password: string,
+  confimPassword: string
+) {
+  if (
+    password == null ||
+    password.length === 0 ||
+    confimPassword == null ||
+    confimPassword.length === 0
+  ) {
+    return {
+      isValid: false,
+      errors: ["Please complete form fields."],
+    };
+  }
+  const errors = [];
   if (!/.{8,}/.test(password)) {
     // Corrected to 8 characters
     errors.push("Password must be at least 8 characters long.");

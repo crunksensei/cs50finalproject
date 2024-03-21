@@ -13,7 +13,6 @@ import {
 import { LoaderFunctionArgs } from "@remix-run/node";
 import { getSession } from "./utils/session.server";
 
-
 export async function loader({ request }: LoaderFunctionArgs) {
   const session = await getSession(request.headers.get("Cookie"));
   return { session };
@@ -66,14 +65,21 @@ function Layout({ children }: { children: React.ReactNode }) {
         </form>
 
         {data.session.data.userId ? (
-          <form action="/logout" method="post">
-            <button
-              type="submit"
-              className="bg-teal-500 px-4 py-2 rounded-lg text-white "
-            >
-              Logout
-            </button>
-          </form>
+          <div className="flex gap-4">
+            <form action="/logout" method="post">
+              <button
+                type="submit"
+                className="bg-teal-500 px-4 py-2 rounded-lg text-white "
+              >
+                Logout
+              </button>
+            </form>
+            <Link to="/account">
+              <button className="bg-teal-500 px-4 py-2 rounded-lg text-white">
+                Account
+              </button>
+            </Link>
+          </div>
         ) : (
           <div className="flex gap-4">
             <Link to="/login">
@@ -93,3 +99,12 @@ function Layout({ children }: { children: React.ReactNode }) {
     </>
   );
 }
+
+<form action="/logout" method="post">
+  <button
+    type="submit"
+    className="bg-teal-500 px-4 py-2 rounded-lg text-white "
+  >
+    Logout
+  </button>
+</form>;

@@ -13,6 +13,7 @@ model users {
   timestamp DateTime @default(now())
   username  String   @unique
   email     String   @unique
+  ratings    Rating[]
 }
 
 model comment {
@@ -30,4 +31,16 @@ model session {
   expires   DateTime 
   createdAt DateTime @default(now())
   isValid   Boolean  @default(true)
+}
+
+
+model Rating {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  score      Int
+  ratingDate DateTime
+  gameId     Int      
+  userId     String  @db.ObjectId
+
+  // Relations
+  user       users @relation(fields: [userId], references: [id])
 }
