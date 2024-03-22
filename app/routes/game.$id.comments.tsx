@@ -118,7 +118,7 @@ export default function Comments() {
           )}
         </Form>
         <div className="space-y-4">
-          {fetcher.data == undefined
+          {fetcher?.data == undefined
             ? data.map((e, index) => (
                 <div
                   key={index}
@@ -131,7 +131,7 @@ export default function Comments() {
                   </div>
                 </div>
               ))
-            : fetcher.data.map((e, index) => (
+            : fetcher?.data.map((e, index) => (
                 <div
                   key={index}
                   className="border-l-4 border-teal-500 pl-4 py-2 bg-gray-50 rounded"
