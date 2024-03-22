@@ -1,6 +1,7 @@
 import type { LoaderFunction } from "@remix-run/node";
 import { Outlet, useLoaderData } from "@remix-run/react";
 import { getSession } from "../utils/session.server";
+import sanitizeHtml from 'sanitize-html';
 
 type Game = {
   id: number;
@@ -13,6 +14,7 @@ type Game = {
   description_raw: string;
   publishers: { name: string }[];
   tags: { name: string }[];
+  description: string;
 };
 
 export const loader: LoaderFunction = async ({ params, request }) => {
@@ -31,7 +33,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
 
 export default function GameId() {
   const game = useLoaderData<Game>();
-
+  const sanitizedDescription = sanitizeHtml(game.description);
   return (
     <div className="min-h-screen p-10">
       <img
@@ -48,7 +50,13 @@ export default function GameId() {
           </p>
           <p>{game.genres.map((g) => g.name).join(", ")}</p>
           <p>{game.platforms.map((p) => p.platform.name).join(", ")}</p>
-          <p>{game.description_raw}</p>
+          {game.description ? (
+            <div dangerouslySetInnerHTML={{ __html: sanitizedDescription }}></div>
+          ):
+          (
+            <p>{game.description_raw}</p>
+          )
+          }          
           <p>{game.publishers[0].name}</p>
           <p>{game.tags.map((t) => t.name).join(", ")}</p>
           <p className="mt-2 text-sm text-gray-600">{game.released}</p>
