@@ -11,13 +11,23 @@
     "typecheck": "tsc"
   },
   "dependencies": {
+    "@prisma/client": "^5.11.0",
     "@remix-run/css-bundle": "^2.8.0",
     "@remix-run/node": "^2.8.0",
     "@remix-run/react": "^2.8.0",
     "@remix-run/serve": "^2.8.0",
+    "aws-sdk": "^2.1579.0",
+    "bcryptjs": "^2.4.3",
     "isbot": "^4.1.0",
+    "mock-aws-s3": "^4.0.2",
+    "mongodb": "^6.4.0",
+    "mongoose": "^8.2.1",
+    "nock": "^13.5.4",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "remix": "^2.8.1",
+    "remix-auth": "^3.6.0",
+    "sanitize-html": "^2.13.0"
   },
   "devDependencies": {
     "@remix-run/dev": "^2.8.0",
@@ -31,6 +41,8 @@
     "eslint-plugin-jsx-a11y": "^6.7.1",
     "eslint-plugin-react": "^7.33.2",
     "eslint-plugin-react-hooks": "^4.6.0",
+    "prisma": "^5.11.0",
+    "tailwindcss": "^3.4.1",
     "typescript": "^5.1.6"
   },
   "engines": {
