@@ -99,7 +99,7 @@ export default function Comments() {
             }}
             className="w-full border border-teal-500 rounded-lg p-2"
           ></textarea>
-          <input type="hidden" name="id" value={data.id} />
+          <input type="hidden" name="id" value={gameId} />
           {navigation.state === "submitting" ? (
             <button
               type="submit"
