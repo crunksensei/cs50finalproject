@@ -13,15 +13,17 @@ model users {
   timestamp DateTime @default(now())
   username  String   @unique
   email     String   @unique
-  ratings    Rating[]
+  ratings   Rating[]
+  comments  comment[]
 }
 
 model comment {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   timestamp DateTime @default(now())
   text      String
-  username  String
+  username  String   
   gameid    String
+  user      users    @relation(fields: [username], references: [username])
 }
 
 model session {

@@ -57,7 +57,6 @@ export async function action({ request }: ActionFunctionArgs) {
   const existingSession = await db.session.findFirst({
     where: { userId },
   });
-  console.log(existingSession);
   if (existingSession) {
     // If a session exists, update it with the new token and expiration
     await db.session.update({
