@@ -41,6 +41,7 @@ model Rating {
   ratingDate DateTime
   gameId     String
   userId     String   @db.ObjectId
+  gameName   String
 
   users   users?  @relation(fields: [userId], references: [id])
 }

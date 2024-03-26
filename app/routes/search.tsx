@@ -1,4 +1,4 @@
-// file: app/routes/search.js
+
 import { json } from "@remix-run/node";
 import { useLoaderData, Link } from "@remix-run/react";
 import { getSession } from "../utils/session.server";
@@ -26,7 +26,6 @@ type LoaderData = {
 };
 
 export async function loader({ request }) {
-  const session = await getSession(request.headers.get("Cookie"));
   const apikey = process.env.apikey;
   const url = new URL(request.url);
   const query = url.searchParams.get("query");
@@ -49,9 +48,6 @@ export async function loader({ request }) {
     query: query,
   });
 }
-
-
-
 
 export default function Index() {
   const { games, currentPage, totalPages, query } = useLoaderData<LoaderData>(); 

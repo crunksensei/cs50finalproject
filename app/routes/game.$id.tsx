@@ -3,13 +3,14 @@ import {
   Form,
   Outlet,
   useLoaderData,
-  useActionData,
   redirect,
   useNavigation,
 } from "@remix-run/react";
 import { getSession } from "../utils/session.server";
 import sanitizeHtml from "sanitize-html";
 import { db } from "~/utils/db.server";
+import { Doughnut } from "react-chartjs-2";
+import "chart.js/auto";
 
 type Game = {
   id: number;
@@ -27,7 +28,6 @@ type Game = {
 };
 
 export const loader: LoaderFunction = async ({ params, request }) => {
-  const session = await getSession(request.headers.get("Cookie"));
   const apikey = "e7acb02f54c445d4a95223c5a5104f64";
   const url = `https://api.rawg.io/api/games/${params.id}?key=${apikey}`;
   try {
@@ -47,10 +47,12 @@ export const loader: LoaderFunction = async ({ params, request }) => {
 
 export const action: ActionFunction = async ({ request, params }) => {
   const session = await getSession(request.headers.get("Cookie"));
+
   if (!session.has("userId")) {
     return redirect("/login");
   }
   const formData = await request.formData();
+  const gameName = formData.get("gameName");
   const rating = formData.get("rating");
   const userRating = await db.rating.findFirst({
     where: {
@@ -80,35 +82,56 @@ export const action: ActionFunction = async ({ request, params }) => {
         score: rating as string,
         ratingDate: new Date(),
         userId: session.get("userId"),
+        gameName: gameName,
       },
     });
   }
   return redirect(`/game/${params.id}/comments`);
 };
-function getColor(rating) {
-  switch (rating) {
-    case 'MustPlay':
-      return 'bg-blue-500';
-    case 'Great':
-      return 'bg-green-500';
-    case 'Average':
-      return 'bg-yellow-500';
-    case 'Skip':
-      return 'bg-red-500';
-    default:
-      return 'bg-gray-500';
-  }
-}
 
+export function RatingsDoughnutChart({ ratings }) {
+  // Define the data for the Doughnut chart
+  const data = {
+    labels: Object.keys(ratings),
+    datasets: [
+      {
+        label: "Ratings",
+        data: Object.values(ratings),
+        backgroundColor: [
+          "rgba(0, 0, 255, 1)", // blue for MustPlay
+          "rgba(0, 255, 0, 1)", // green for Great
+          "rgba(255, 165, 0, 1)", // yellow for Average
+          "rgba(255, 0, 0, 1)", // red for Skip
+        ],
+        borderColor: [
+          "rgba(0, 0, 255, 1)",
+          "rgba(0, 255, 0, 1)",
+          "rgba(255, 165, 0, 1)",
+          "rgba(255, 0, 0, 1)",
+        ],
+        borderWidth: 1,
+      },
+    ],
+  };
+
+  const options = {
+    maintainAspectRatio: false,
+    responsive: true,
+  };
+
+  return (
+    <div style={{ width: "300px", height: "300px" }}>
+      <Doughnut data={data} options={options} />
+    </div>
+  );
+}
 
 export default function GameId() {
   const loaderData = useLoaderData();
-
   const scoreCounts = loaderData.ratings.reduce((acc, { score }) => {
     acc[score] = (acc[score] || 0) + 1;
     return acc;
   }, {});
-  // console.log(scoreCounts)
   const sanitizedDescription = sanitizeHtml(loaderData.game.description);
   const ratings = {
     MustPlay: scoreCounts?.MustPlay || 0,
@@ -116,14 +139,7 @@ export default function GameId() {
     Average: scoreCounts?.Average || 0,
     Skip: scoreCounts?.Skip || 0,
   };
-  const totalRatings = Object.values(ratings).reduce(
-    (acc, curr) => acc + curr,
-    0
-  );
-
   const navigation = useNavigation();
-  const getPercentage = (count) => `${(count / totalRatings) * 100}%`;
-
   return (
     <div className="min-h-screen bg-white p-10 w-full">
       <div className="flex justify-center">
@@ -137,24 +153,21 @@ export default function GameId() {
         <div className="w-full md:w-1/2">
           <div className="p-8">
             <h1 className="text-3xl font-bold mb-3">{loaderData.game.name}</h1>
-
-            <div className="w-full bg-gray-200 rounded-full h-5 dark:bg-gray-700 my-4 flex">
-  {Object.keys(ratings).map((rating, index, array) => (
-    <div
-      key={rating}
-      className={`h-5 text-center ${getColor(rating)} ${index === 0 ? 'rounded-l-full' : ''} ${index === array.length - 1 ? 'rounded-r-full' : ''}`}
-      style={{ width: getPercentage(ratings[rating]) }}
-    ></div>
-  ))}
-</div>
-
+            <div className="w-full flex justify-center items-center p-8">
+              <RatingsDoughnutChart ratings={ratings} />
+            </div>
             <Form method="post">
+              <input
+                type="hidden"
+                name="gameName"
+                value={loaderData.game.name}
+              />
               <div className="flex justify-center gap-2 mt-4">
                 {navigation.state === "submitting" ? (
                   <button
                     type="submit"
                     disabled
-                    className="bg-teal-800 px-4 py-2 rounded-lg text-white"
+                    className="bg-blue-500 px-4 py-2 rounded-lg text-white"
                   >
                     Loading...
                   </button>
@@ -165,17 +178,14 @@ export default function GameId() {
                     value="MustPlay"
                     className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
                   >
-                    <span>{ratings.MustPlay}</span>
-                    <br />
-                    <span>Must Play</span>
-
+                    Must Play
                   </button>
                 )}
                 {navigation.state === "submitting" ? (
                   <button
                     type="submit"
                     disabled
-                    className="bg-teal-800 px-4 py-2 rounded-lg text-white"
+                    className="bg-green-500 px-4 py-2 rounded-lg text-white"
                   >
                     Loading...
                   </button>
@@ -186,16 +196,14 @@ export default function GameId() {
                     value="Great"
                     className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
                   >
-                    <span>{ratings.Great}</span>
-                    <br />
-                    <span>Great</span>
+                    Great
                   </button>
                 )}
                 {navigation.state === "submitting" ? (
                   <button
                     type="submit"
                     disabled
-                    className="bg-teal-800 px-4 py-2 rounded-lg text-white"
+                    className="bg-yellow-400 px-4 py-2 rounded-lg text-white"
                   >
                     Loading...
                   </button>
@@ -204,18 +212,16 @@ export default function GameId() {
                     type="submit"
                     name="rating"
                     value="Average"
-                    className="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded"
+                    className="bg-yellow-400 hover:bg-yellow-500 text-white font-bold py-2 px-4 rounded"
                   >
-                    <span>{ratings.Average}</span>
-                    <br />
-                    <span>Average</span>
+                    Average
                   </button>
                 )}
                 {navigation.state === "submitting" ? (
                   <button
                     type="submit"
                     disabled
-                    className="bg-teal-800 px-4 py-2 rounded-lg text-white"
+                    className="bg-red-500 px-4 py-2 rounded-lg text-white"
                   >
                     Loading...
                   </button>
@@ -226,9 +232,7 @@ export default function GameId() {
                     value="Skip"
                     className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
                   >
-                    <span>{ratings.Skip}</span>
-                    <br />
-                    <span>Skip</span>
+                    Skip
                   </button>
                 )}
               </div>
@@ -289,45 +293,3 @@ export default function GameId() {
     </div>
   );
 }
-
-
-
-
-
-
-
-
-
-{/* <div className="w-full bg-gray-200 rounded-full h-5 dark:bg-gray-700 my-4 relative">
-<div
-  className="bg-blue-500 h-5 rounded-l-full absolute text-center"
-  style={{ width: getPercentage(ratings.MustPlay) }}
-></div>
-<div
-  className="bg-green-500 h-5 absolute text-center"
-  style={{
-    left: getPercentage(ratings.MustPlay),
-    width: getPercentage(ratings.Great),
-  }}
-></div>
-<div
-  className="bg-yellow-500 h-5 absolute text-center"
-  style={{
-    left: `calc(${getPercentage(
-      ratings.Average
-    )} + ${getPercentage(ratings.Great)})`,
-    width: getPercentage(ratings.Average),
-  }}
-></div>
-<div
-  className="bg-red-500 h-5 rounded-r-full absolute text-center"
-  style={{
-    left: `calc(${getPercentage(
-      ratings.MustPlay
-    )} + ${getPercentage(ratings.Great)} + ${getPercentage(
-      ratings.Average
-    )})`,
-    width: getPercentage(ratings.Skip),
-  }}
-></div>
-</div> */}
