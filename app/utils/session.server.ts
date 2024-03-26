@@ -33,7 +33,7 @@ export async function validateCredentials(
   }
   const user = await db.users.findFirst({
     where: {
-      email: email,
+      email: email.toLowerCase(),
     },
   });
   if (!user || user == null) {
@@ -116,8 +116,8 @@ export async function hashAndStore(
       try {
         const newUser = await db.users.create({
           data: {
-            username: username,
-            email: email,
+            username: username.toLowerCase(),
+            email: email.toLowerCase(),
             password: hash,
           },
         });
@@ -157,7 +157,7 @@ export async function validateRegister(
   const errors = [];
   const userExists = await db.users.findFirst({
     where: {
-      OR: [{ email: email }, { username: username }],
+      OR: [{ email: email.toLowerCase() }, { username: username.toLowerCase() }],
     },
   });
 
