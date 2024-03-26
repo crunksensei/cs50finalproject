@@ -1,4 +1,3 @@
-// utils/auth.js
 import {
   getSession,
   validateSessionToken,
@@ -22,7 +21,7 @@ async function isAuthenticated(request) {
     await destroySession(session);
     throw redirect("/login");
   }
-  // If everything checks out, the session is considered authenticated
+
   return true;
 }
 

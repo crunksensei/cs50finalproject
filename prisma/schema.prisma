@@ -8,11 +8,11 @@ datasource db {
 }
 
 model users {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
   password  String
-  timestamp DateTime @default(now())
-  username  String   @unique
-  email     String   @unique
+  timestamp DateTime  @default(now())
+  username  String    @unique
+  email     String    @unique
   ratings   Rating[]
   comments  comment[]
 }
@@ -21,7 +21,7 @@ model comment {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   timestamp DateTime @default(now())
   text      String
-  username  String   
+  username  String
   gameid    String
   user      users    @relation(fields: [username], references: [username])
 }
@@ -30,19 +30,18 @@ model session {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   userId    String?  @db.ObjectId
   token     String   @unique
-  expires   DateTime 
+  expires   DateTime
   createdAt DateTime @default(now())
   isValid   Boolean  @default(true)
 }
 
-
 model Rating {
   id         String   @id @default(auto()) @map("_id") @db.ObjectId
-  score      Int
+  score      String
   ratingDate DateTime
-  gameId     Int      
-  userId     String  @db.ObjectId
+  gameId     String
+  userId     String   @db.ObjectId
+  gameName   String
 
-  // Relations
-  user       users @relation(fields: [userId], references: [id])
+  users   users?  @relation(fields: [userId], references: [id])
 }

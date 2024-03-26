@@ -6,7 +6,12 @@ import {
   useFetcher,
   useActionData,
 } from "@remix-run/react";
-import { LoaderFunction, ActionFunctionArgs, redirect, json  } from "@remix-run/node";
+import {
+  LoaderFunction,
+  ActionFunctionArgs,
+  redirect,
+  json,
+} from "@remix-run/node";
 import { db } from "~/utils/db.server";
 import { getSession, addComment } from "../utils/session.server";
 
@@ -84,15 +89,16 @@ export default function Comments() {
     <div className="rounded-lg boarder p-3">
       <h1 className="text-xl font-semibold mb-5">Your Opinion</h1>
       <div>
-      {actionData?.error && ( // Use optional chaining here
+        {actionData?.error && ( // Use optional chaining here
           <div className="bg-red-500 text-white p-3 rounded-lg">
             {actionData.error}
-        </div>)}
+          </div>
+        )}
         <Form method="POST">
           <textarea
             name="comment"
             onKeyDown={(e) => {
-              if (e.key === 'Enter' && !e.shiftKey) {
+              if (e.key === "Enter" && !e.shiftKey) {
                 e.preventDefault(); // Prevent default to stop from adding a new line
                 e.currentTarget.form.requestSubmit(); // Submit the form
               }
@@ -146,12 +152,12 @@ export default function Comments() {
         </div>
         {data.length > 29 ? (
           <button
-          onClick={handleLoadMore}
-          className="mt-4 bg-teal-500 hover:bg-teal-600 px-4 py-2 rounded-lg text-white transition duration-150 ease-in-out"
-        >
-          Load More
-        </button>
-        ): null}        
+            onClick={handleLoadMore}
+            className="mt-4 bg-teal-500 hover:bg-teal-600 px-4 py-2 rounded-lg text-white transition duration-150 ease-in-out"
+          >
+            Load More
+          </button>
+        ) : null}
       </div>
     </div>
   );

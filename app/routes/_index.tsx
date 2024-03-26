@@ -1,7 +1,5 @@
 import type { LoaderFunction, MetaFunction } from "@remix-run/node";
 import { useLoaderData, Link } from "@remix-run/react";
-import { getSession } from "../utils/session.server";
-
 
 type Game = {
   id: number;
@@ -24,7 +22,6 @@ export const meta: MetaFunction = () => {
 
 export const loader: LoaderFunction = async ({ request }): Promise<Game[]> => {
   const apikey = process.env.apikey;
-  const session = await getSession(request.headers.get("Cookie"));
   const urlParams = new URL(request.url).searchParams;
   const category = urlParams.get("category") || "trending";
   const year = new Date().getFullYear();
@@ -49,7 +46,7 @@ export const loader: LoaderFunction = async ({ request }): Promise<Game[]> => {
         !nsfwKeywords.includes(game.esrb_rating.name)
       );
     });
-    return filteredData.splice(0,12);
+    return filteredData.splice(0, 12);
   } catch (error) {
     console.error("Error fetching data:", error);
     throw new Response("Error fetching data", { status: 500 });

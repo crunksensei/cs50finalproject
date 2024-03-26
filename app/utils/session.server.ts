@@ -1,15 +1,10 @@
-// app/services/session.server.ts
 import { createCookieSessionStorage } from "@remix-run/node";
 import { db } from "~/utils/db.server";
 import bcrypt from "bcryptjs";
 import crypto from "crypto";
 
-// type SessionData = {
-//   userId: string;
-// };
-
 export function generateSecureToken() {
-  return crypto.randomBytes(16).toString("hex"); // Generates a 32-character hex string
+  return crypto.randomBytes(16).toString("hex");
 }
 
 // export the whole sessionStorage object
@@ -115,7 +110,7 @@ export async function hashAndStore(
   return new Promise((resolve, reject) => {
     bcrypt.hash(password, 10, async (err, hash) => {
       if (err) {
-        reject(err); // Reject the Promise if there's an error
+        reject(err);
         return;
       }
       try {
@@ -126,9 +121,9 @@ export async function hashAndStore(
             password: hash,
           },
         });
-        resolve(newUser.id); // Resolve with the new user's ID
+        resolve(newUser.id);
       } catch (error) {
-        reject(error); // Reject the Promise if creating the user fails
+        reject(error);
       }
     });
   });

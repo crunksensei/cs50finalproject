@@ -16,5 +16,5 @@ if (process.env.NODE_ENV === "production") {
   db.$connect();
 }
 
-// Hard-code a unique key, so we can look up the client when this module gets re-imported
+
 export { db };

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useActionData, useLoaderData, Link, Form } from "@remix-run/react";
+import { useActionData, Form } from "@remix-run/react";
 import {
   json,
   LoaderFunction,
@@ -29,7 +29,6 @@ export const action: ActionFunction = async ({ request }) => {
   }
   const userId = session.get("userId");
   const form = await request.formData();
-  // Handle password update
   const password = form.get("password");
   const confirmPassword = form.get("confirmPassword");
   const newHash = await generateHash(password);
@@ -50,7 +49,6 @@ export const action: ActionFunction = async ({ request }) => {
     }
   }
 
-  // Default response for unknown action
   return new Response("Unknown action", { status: 400 });
 };
 
@@ -76,8 +74,6 @@ function PasswordComplexityMessage({ password, confirmPassword }) {
   );
 }
 
-
-
 export default function AccountPassword() {
   const actionData = useActionData();
   const [password, setPassword] = useState("");
@@ -98,7 +94,10 @@ export default function AccountPassword() {
         </div>
       )}
       {actionData?.success && (
-        <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded my-2 relative" role="alert">
+        <div
+          className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded my-2 relative"
+          role="alert"
+        >
           <strong className="font-bold">Success: </strong>
           <span>{actionData.success}</span>
         </div>
