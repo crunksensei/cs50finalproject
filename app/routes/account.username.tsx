@@ -62,7 +62,7 @@ export const action: ActionFunction = async ({ request }) => {
       await db.users.update({
         where: { id: userId },
         data: {
-          username: newUsername,
+          username: newUsername.toLowerCase(),
         },
       });
       return json({ success: "Username updated successfully!" });
